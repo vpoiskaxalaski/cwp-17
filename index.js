@@ -37,11 +37,16 @@ const pdfUpload = multer({
 	storage: multer.diskStorage({
 		destination: './uploads/pdf/',
 		filename: (req, file, cb) => {
+			console.log(req.files.length);
 			cb(null, `${uuid()}${file.ext = path.extname(file.originalname)}`);
 		}
 	}),
 	fileFilter: function fileFilter(req, file, cb) {
-		file.mimetype.split('/')[1] === 'pdf' ? cb(null, true) : cb(null, false); //?????????
+		
+		if(req.files.length<4 ){
+			file.mimetype.split('/')[1] === 'pdf' ? cb(null, true) : cb(null, false); 
+		}
+		
 	}
 });
 
@@ -50,7 +55,8 @@ app.get('/pdf', upload.single('file'), (req, res) => {
 });
 
 app.post('/pdf', pdfUpload.array('files', 3), (req, res) => {
-	if (req.files.length < 1 || req.files.map((elem) => elem.ext !== '.pdf').indexOf(true) > -1 ||pdfUpload.array.length>3) {
+	console.log('post');
+	if (req.files.length < 1 || req.files.map((elem) => elem.ext !== '.pdf').indexOf(true) > -1) {
 		res.json({
 			error: 501,
 			message: 'file upload error or wrong extension'
@@ -59,7 +65,7 @@ app.post('/pdf', pdfUpload.array('files', 3), (req, res) => {
 	else {
 		console.log(req);
 		res.json({
-			files: req.files.map((file) => file.filename)
+			files: req.files.map((file) => file.filename)//???
 		});
 	}
 });
